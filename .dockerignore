@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.github
+agent
+coverage
+*.log
+.env
+.env.*
+!.env.example
+data
+public/data/items.json.gz

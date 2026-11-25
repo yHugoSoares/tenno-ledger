@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#161412" />
+    <meta
+      name="description"
+      content="Tenno Ledger is a free, open-source Warframe mastery tracker. See what you have mastered, what is missing, and what to level next. Unofficial fan project."
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta property="og:title" content="Tenno Ledger — Warframe Mastery Tracker" />
+    <meta
+      property="og:description"
+      content="Map your Warframe mastery, find the cheapest missing items, and share a read-only profile. No accounts. No server-side profile fetching."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Tenno Ledger" />
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tenno Ledger — Warframe mastery tracker" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tenno Ledger — Warframe Mastery Tracker" />
+    <meta
+      name="twitter:description"
+      content="Map your Warframe mastery, find the cheapest missing items, and share a read-only profile. No accounts. No server-side profile fetching."
+    />
+    <meta name="twitter:image" content="/og.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://cdn.warframestat.us" crossorigin />
+    <script>
+      try {
+        var savedTheme = localStorage.getItem('tenno-ledger.theme.v1');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = savedTheme === 'light' ? false : savedTheme === 'system' ? prefersDark : true;
+        document.documentElement.classList.toggle('dark', isDark);
+        document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+        var themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) themeColor.setAttribute('content', isDark ? '#161412' : '#f6f4f0');
+      } catch (error) {
+        /* Keep the default dark theme when storage is unavailable. */
+      }
+    </script>
+    <title>Tenno Ledger — Warframe Mastery Tracker</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="padding: 2rem; font-family: sans-serif; color: #ece6dd; background: #161412">
+        Tenno Ledger needs JavaScript to read and display your profile locally. Nothing is sent to a server.
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+# Runtime item mirror.
+#
+# The `data-sync` container writes `items.json` and `items.json.gz` here once a
+# day, and Caddy serves them at https://<DOMAIN>/data/items.json.
+#
+# This directory is mounted into the container. Do not commit generated files.

@@ -1,0 +1,188 @@
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
+@import '@fontsource/rajdhani/latin-500.css';
+@import '@fontsource/rajdhani/latin-600.css';
+@import '@fontsource/rajdhani/latin-700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes blur-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes icon-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: scale(0.7) rotate(-25deg);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+:root {
+  --surface: 22 20 18;
+  --surface-2: 30 27 24;
+  --surface-3: 41 37 33;
+  --body: 236 230 221;
+  --muted: 166 156 143;
+  --line: 236 230 221;
+  --accent: 240 130 60;
+  --accent-contrast: 22 20 18;
+  --gold: 250 190 60;
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  --surface: 246 244 240;
+  --surface-2: 255 255 255;
+  --surface-3: 238 234 227;
+  --body: 31 28 25;
+  --muted: 91 83 74;
+  --line: 31 28 25;
+  --accent: 196 85 30;
+  --accent-contrast: 255 255 255;
+  --gold: 150 96 0;
+  color-scheme: light;
+}
+
+@layer base {
+  body {
+    @apply min-h-screen font-sans text-[15px] leading-6 text-body antialiased;
+    background-color: rgb(var(--surface));
+    background-image: url('/bg/ledger-bg.svg');
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+  }
+
+  /* Solid readability layer. No gradients or glow anywhere in the palette. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: rgb(var(--surface) / 0.9);
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  h1,
+  h2 {
+    @apply font-display font-semibold tracking-tight text-body;
+  }
+
+  h3 {
+    @apply font-semibold tracking-tight text-body;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.3);
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .field {
+    @apply h-10 w-full rounded-md border border-line/20 bg-surface px-3 text-sm text-body outline-none transition-colors placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/25;
+  }
+
+  .kicker {
+    @apply text-xs font-medium uppercase tracking-wider text-muted;
+  }
+
+  .prose-plain {
+    @apply space-y-4 text-[15px] leading-7 text-muted;
+  }
+
+  .prose-plain h2 {
+    @apply mt-10 text-xl font-semibold text-body;
+  }
+
+  .prose-plain h3 {
+    @apply mt-6 text-base font-semibold text-body;
+  }
+
+  .prose-plain ul {
+    @apply list-disc space-y-2 pl-5;
+  }
+
+  .prose-plain a {
+    @apply text-accent underline underline-offset-4;
+  }
+
+  .prose-plain strong {
+    @apply font-semibold text-body;
+  }
+
+  .prose-plain code {
+    @apply rounded bg-surface-3 px-1.5 py-0.5 font-mono text-[0.85em] text-body;
+  }
+}
+
+@layer utilities {
+  .blur-in {
+    animation: blur-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .icon-in {
+    animation: icon-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+}

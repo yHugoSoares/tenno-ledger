@@ -1,0 +1,52 @@
+# Caddyfile — static hosting for Tenno Ledger.
+# Only files are served. There is no application server, database, or proxy.
+# Nothing here ever contacts api.warframe.com.
+
+{
+	# Set ACME_EMAIL in .env if you want Let's Encrypt expiry notices.
+	email {$ACME_EMAIL:admin@example.com}
+	# Uncomment while testing to avoid burning Let's Encrypt rate limits:
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+# Canonical apex domain.
+{$DOMAIN:localhost} {
+	root * /srv
+	encode zstd gzip
+
+	# Immutable, content-hashed build assets.
+	@immutable path /assets/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# Item mirror: refreshed daily by the data-sync container.
+	@data path /data/*
+	header @data Cache-Control "public, max-age=3600, stale-while-revalidate=86400"
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		# Profile fetches run in the visitor's browser, so api.warframe.com must
+		# be reachable from the page. The GitHub raw + CDN hosts serve item data
+		# and images only.
+		Content-Security-Policy "default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.warframestat.us https://raw.githubusercontent.com; font-src 'self'; connect-src 'self' https://api.warframe.com https://raw.githubusercontent.com https://cdn.warframestat.us; manifest-src 'self'"
+		-Server
+	}
+
+	# Single-page app fallback. Real files win; everything else gets index.html.
+	try_files {path} /index.html
+	file_server
+
+	handle_errors {
+		@notfound expression {http.error.status_code} == 404
+		rewrite @notfound /index.html
+		file_server
+	}
+}
+
+# www redirects to the apex.
+www.{$DOMAIN:localhost} {
+	redir https://{$DOMAIN:localhost}{uri} permanent
+}

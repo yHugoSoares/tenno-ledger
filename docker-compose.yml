@@ -1,0 +1,59 @@
+# Tenno Ledger — static site + daily item mirror.
+#
+#   1. cp .env.example .env   (set DOMAIN and ACME_EMAIL)
+#   2. docker compose up -d --build
+#
+# The web container serves static files only. The sync container writes the
+# WFCD item mirror to ./data/items.json once per day. No container ever calls
+# api.warframe.com.
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_GITHUB_URL: ${VITE_GITHUB_URL:-}
+    image: tenno-ledger:latest
+    restart: unless-stopped
+    depends_on:
+      - data-sync
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./data:/srv/data:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    security_opt:
+      - no-new-privileges:true
+
+  data-sync:
+    image: node:22-alpine
+    restart: unless-stopped
+    environment:
+      WFCD_ITEMS_BASE: ${WFCD_ITEMS_BASE:-https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json}
+      SYNC_INTERVAL_SECONDS: ${SYNC_INTERVAL_SECONDS:-86400}
+    volumes:
+      - ./data:/srv/data
+      - ./scripts/sync-items.mjs:/usr/local/bin/sync-items.mjs:ro
+      - ./scripts/sync-game-data.mjs:/usr/local/bin/sync-game-data.mjs:ro
+    command:
+      - sh
+      - -c
+      - |
+        echo "[data-sync] starting; interval=$${SYNC_INTERVAL_SECONDS}s"
+        while true; do
+          node /usr/local/bin/sync-items.mjs --out /srv/data/items.json || echo "[data-sync] item sync failed; keeping previous data"
+          OUT_DIR=/srv/data node /usr/local/bin/sync-game-data.mjs || echo "[data-sync] game data sync failed; keeping previous data"
+          sleep "$${SYNC_INTERVAL_SECONDS}"
+        done
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  caddy_data:
+  caddy_config:
